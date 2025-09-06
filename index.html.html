@@ -458,32 +458,72 @@ const audioBlob = await response.blob();</code></pre>
             }
         }
 
-        // Apply Nigerian voice characteristics
+        // Apply Nigerian voice characteristics with better voice selection
         function applyNigerianVoiceSettings(utterance, voiceType, speed) {
             utterance.rate = parseFloat(speed);
             utterance.volume = 0.9;
             
-            // Try to find more suitable voices
+            // Get all available voices
             const voices = speechSynthesis.getVoices();
+            console.log('Available voices:', voices.map(v => v.name + ' - ' + v.lang));
             
+            // Nigerian-specific voice modifications
             switch(voiceType) {
                 case 'lagos-female':
-                    utterance.pitch = 1.2;
-                    // Prefer female English voices
-                    const femaleVoice = voices.find(v => v.lang.includes('en') && v.name.toLowerCase().includes('female'));
-                    if (femaleVoice) utterance.voice = femaleVoice;
+                    utterance.pitch = 1.3;
+                    utterance.rate = parseFloat(speed) * 0.95;
+                    // Prefer British English (closer to Nigerian English)
+                    const britishFemale = voices.find(v => 
+                        (v.lang.includes('en-GB') || v.lang.includes('en-AU')) && 
+                        (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('woman'))
+                    );
+                    if (britishFemale) utterance.voice = britishFemale;
                     break;
+                    
                 case 'lagos-male':
-                    utterance.pitch = 0.8;
-                    const maleVoice = voices.find(v => v.lang.includes('en') && v.name.toLowerCase().includes('male'));
-                    if (maleVoice) utterance.voice = maleVoice;
+                    utterance.pitch = 0.7;
+                    utterance.rate = parseFloat(speed) * 0.9;
+                    const britishMale = voices.find(v => 
+                        (v.lang.includes('en-GB') || v.lang.includes('en-AU')) && 
+                        (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('man'))
+                    );
+                    if (britishMale) utterance.voice = britishMale;
                     break;
-                case 'yoruba-accent':
+                    
+                case 'abuja-female':
                     utterance.pitch = 1.1;
-                    utterance.rate = parseFloat(speed) * 0.9; // Slightly slower
+                    utterance.rate = parseFloat(speed) * 1.0; // Professional pace
+                    const professionalFemale = voices.find(v => 
+                        v.lang.includes('en') && v.name.toLowerCase().includes('female')
+                    );
+                    if (professionalFemale) utterance.voice = professionalFemale;
                     break;
+                    
+                case 'yoruba-accent':
+                    utterance.pitch = 1.2;
+                    utterance.rate = parseFloat(speed) * 0.85; // Slower, more melodic
+                    break;
+                    
+                case 'igbo-accent':
+                    utterance.pitch = 1.15;
+                    utterance.rate = parseFloat(speed) * 0.9;
+                    break;
+                    
+                case 'hausa-accent':
+                    utterance.pitch = 0.9;
+                    utterance.rate = parseFloat(speed) * 0.8; // Calm and measured
+                    break;
+                    
                 default:
                     utterance.pitch = 1.0;
+            }
+            
+            // Add pauses for Nigerian speech patterns
+            if (utterance.text.includes('How far') || utterance.text.includes('how far')) {
+                utterance.text = utterance.text.replace(/how far/gi, 'how... far');
+            }
+            if (utterance.text.includes('make we')) {
+                utterance.text = utterance.text.replace(/make we/gi, 'make... we');
             }
         }
 
