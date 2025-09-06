@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NaijaVoice - Nigerian Text-to-Speech Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2E8B57, #228B22);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 5px solid #2E8B57;
+        }
+
+        .section h2 {
+            color: #2E8B57;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        textarea, select, input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus, select:focus, input:focus {
+            outline: none;
+            border-color: #2E8B57;
+            box-shadow: 0 0 10px rgba(46, 139, 87, 0.1);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #2E8B57, #228B22);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 139, 87, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .audio-controls {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .voice-samples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .voice-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            transition: transform 0.2s ease;
+        }
+
+        .voice-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .voice-card h3 {
+            color: #2E8B57;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #b3d9ff;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .pricing-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e0e0e0;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            border-color: #2E8B57;
+        }
+
+        .pricing-card.featured {
+            border-color: #2E8B57;
+            transform: scale(1.05);
+        }
+
+        .price {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2E8B57;
+            margin: 15px 0;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .feature-list li {
+            padding: 5px 0;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #2E8B57;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .pricing-card.featured {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🇳🇬 NaijaVoice</h1>
+            <p>Premium Nigerian Text-to-Speech Platform</p>
+        </div>
+
+        <div class="main-content">
+            <!-- TTS Demo Section -->
+            <div class="section">
+                <h2>🎤 Try Our Voices</h2>
+                <div class="input-group">
+                    <label for="textInput">Enter your text:</label>
+                    <textarea id="textInput" placeholder="Type or paste your text here... e.g., 'Welcome to Lagos! How far with your business today?'">Welcome to Lagos! How far with your business today? We go make am together!</textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="voiceSelect">Choose Voice Style:</label>
+                    <select id="voiceSelect">
+                        <option value="lagos-female">Lagos Female (Cheerful)</option>
+                        <option value="lagos-male">Lagos Male (Professional)</option>
+                        <option value="abuja-female">Abuja Female (News Anchor)</option>
+                        <option value="yoruba-accent">Yoruba Accent (Warm)</option>
+                        <option value="igbo-accent">Igbo Accent (Friendly)</option>
+                        <option value="hausa-accent">Hausa Accent (Calm)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="speedControl">Speed:</label>
+                    <input type="range" id="speedControl" min="0.5" max="2" step="0.1" value="1">
+                    <span id="speedValue">1.0x</span>
+                </div>
+
+                <button class="btn" onclick="generateSpeech()">🎵 Generate Voice</button>
+                <button class="btn" onclick="stopSpeech()">⏹️ Stop</button>
+
+                <div id="status"></div>
+                <div id="audioControls" class="audio-controls" style="display: none;">
+                    <h3>Generated Audio:</h3>
+                    <audio id="audioPlayer" controls style="width: 100%; margin-top: 10px;"></audio>
+                    <button class="btn" onclick="downloadAudio()" style="margin-top: 15px;">⬇️ Download MP3</button>
+                </div>
+            </div>
+
+            <!-- Voice Samples -->
+            <div class="section">
+                <h2>🎯 Voice Samples</h2>
+                <div class="voice-samples">
+                    <div class="voice-card">
+                        <h3>Lagos Professional</h3>
+                        <p>"Good morning, this is your daily business update from Lagos State."</p>
+                        <button class="btn" onclick="playDemo('lagos-professional')">▶️ Play Sample</button>
+                    </div>
+                    <div class="voice-card">
+                        <h3>Pidgin Friendly</h3>
+                        <p>"How you dey? Make we talk business small small."</p>
+                        <button class="btn" onclick="playDemo('pidgin-friendly')">▶️ Play Sample</button>
+                    </div>
+                    <div class="voice-card">
+                        <h3>Yoruba Accent</h3>
+                        <p>"E ku aaro o! Today's weather go dey very fine."</p>
+                        <button class="btn" onclick="playDemo('yoruba-accent')">▶️ Play Sample</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Integration -->
+            <div class="section">
+                <h2>🔧 API Integration</h2>
+                <p>Integrate NaijaVoice into your applications:</p>
+                <div style="background: #2d3748; color: #e2e8f0; padding: 20px; border-radius: 10px; margin: 15px 0; overflow-x: auto;">
+                    <pre><code>// JavaScript Example
+const response = await fetch('https://api.naijavoice.com/v1/synthesize', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    text: 'How far? Make we do business together!',
+    voice: 'lagos-female',
+    speed: 1.0,
+    format: 'mp3'
+  })
+});
+
+const audioBlob = await response.blob();</code></pre>
+                </div>
+                <button class="btn">📘 View Full API Docs</button>
+                <button class="btn">🔑 Get API Key</button>
+            </div>
+
+            <!-- Pricing -->
+            <div class="section">
+                <h2>💰 Pricing Plans</h2>
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <h3>Starter</h3>
+                        <div class="price">₦5,000<small>/month</small></div>
+                        <ul class="feature-list">
+                            <li>10,000 characters/month</li>
+                            <li>3 voice styles</li>
+                            <li>MP3 download</li>
+                            <li>Email support</li>
+                        </ul>
+                        <button class="btn">Choose Plan</button>
+                    </div>
+                    
+                    <div class="pricing-card featured">
+                        <h3>Business</h3>
+                        <div class="price">₦15,000<small>/month</small></div>
+                        <ul class="feature-list">
+                            <li>50,000 characters/month</li>
+                            <li>All voice styles</li>
+                            <li>Multiple formats</li>
+                            <li>API access</li>
+                            <li>Priority support</li>
+                        </ul>
+                        <button class="btn">Most Popular</button>
+                    </div>
+                    
+                    <div class="pricing-card">
+                        <h3>Enterprise</h3>
+                        <div class="price">Custom</div>
+                        <ul class="feature-list">
+                            <li>Unlimited usage</li>
+                            <li>Custom voices</li>
+                            <li>White-label option</li>
+                            <li>Dedicated support</li>
+                            <li>SLA guarantee</li>
+                        </ul>
+                        <button class="btn">Contact Sales</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Business Dashboard Preview -->
+            <div class="section">
+                <h2>📊 Usage Dashboard</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; border: 2px solid #e0e0e0;">
+                        <h3 style="color: #2E8B57;">Characters Used</h3>
+                        <div style="font-size: 2em; font-weight: bold; color: #333;">2,847</div>
+                        <small>of 10,000 this month</small>
+                    </div>
+                    <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; border: 2px solid #e0e0e0;">
+                        <h3 style="color: #2E8B57;">API Calls</h3>
+                        <div style="font-size: 2em; font-weight: bold; color: #333;">156</div>
+                        <small>successful requests</small>
+                    </div>
+                    <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; border: 2px solid #e0e0e0;">
+                        <h3 style="color: #2E8B57;">Revenue</h3>
+                        <div style="font-size: 2em; font-weight: bold; color: #333;">₦24,500</div>
+                        <small>this month</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentAudio = null;
+        let isGenerating = false;
+
+        // Update speed display
+        document.getElementById('speedControl').addEventListener('input', function() {
+            document.getElementById('speedValue').textContent = this.value + 'x';
+        });
+
+        // Generate speech function
+        async function generateSpeech() {
+            if (isGenerating) return;
+            
+            const text = document.getElementById('textInput').value.trim();
+            const voice = document.getElementById('voiceSelect').value;
+            const speed = document.getElementById('speedControl').value;
+            
+            if (!text) {
+                showStatus('Please enter some text to convert.', 'error');
+                return;
+            }
+            
+            isGenerating = true;
+            showStatus('Generating Nigerian voice audio...', 'info');
+            
+            try {
+                // Simulate API call with realistic delay
+                await simulateAPICall(text, voice, speed);
+                
+                // For demo purposes, we'll use browser TTS with Nigerian-inspired modifications
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Apply voice modifications based on selection
+                applyNigerianVoiceSettings(utterance, voice, speed);
+                
+                // Create audio URL for download
+                createDownloadableAudio(text, voice);
+                
+                showStatus('✅ Voice generated successfully!', 'success');
+                document.getElementById('audioControls').style.display = 'block';
+                
+                utterance.onend = () => {
+                    isGenerating = false;
+                };
+                
+                speechSynthesis.speak(utterance);
+                currentAudio = utterance;
+                
+            } catch (error) {
+                showStatus('Error generating voice. Please try again.', 'error');
+                isGenerating = false;
+            }
+        }
+
+        // Apply Nigerian voice characteristics
+        function applyNigerianVoiceSettings(utterance, voiceType, speed) {
+            utterance.rate = parseFloat(speed);
+            utterance.volume = 0.9;
+            
+            // Try to find more suitable voices
+            const voices = speechSynthesis.getVoices();
+            
+            switch(voiceType) {
+                case 'lagos-female':
+                    utterance.pitch = 1.2;
+                    // Prefer female English voices
+                    const femaleVoice = voices.find(v => v.lang.includes('en') && v.name.toLowerCase().includes('female'));
+                    if (femaleVoice) utterance.voice = femaleVoice;
+                    break;
+                case 'lagos-male':
+                    utterance.pitch = 0.8;
+                    const maleVoice = voices.find(v => v.lang.includes('en') && v.name.toLowerCase().includes('male'));
+                    if (maleVoice) utterance.voice = maleVoice;
+                    break;
+                case 'yoruba-accent':
+                    utterance.pitch = 1.1;
+                    utterance.rate = parseFloat(speed) * 0.9; // Slightly slower
+                    break;
+                default:
+                    utterance.pitch = 1.0;
+            }
+        }
+
+        // Simulate API call
+        function simulateAPICall(text, voice, speed) {
+            return new Promise(resolve => {
+                const delay = Math.min(text.length * 50, 3000); // Realistic delay based on text length
+                setTimeout(resolve, delay);
+            });
+        }
+
+        // Create downloadable audio (simulated)
+        function createDownloadableAudio(text, voice) {
+            // In real implementation, this would be the actual audio file from your API
+            const audioPlayer = document.getElementById('audioPlayer');
+            
+            // For demo, we'll create a data URL (in production, this would be your generated audio)
+            audioPlayer.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+Dt0HkpBSl+zPHZiS4HJ3fH8N2QQAoUX7Tp66hVFApGn+Dt0HkpBSl+zPHZiS4HK...';
+        }
+
+        // Stop speech
+        function stopSpeech() {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+                showStatus('Voice generation stopped.', 'info');
+            }
+            isGenerating = false;
+        }
+
+        // Download audio
+        function downloadAudio() {
+            showStatus('In production, this would download your generated Nigerian voice audio as MP3.', 'info');
+            // In real implementation:
+            // const link = document.createElement('a');
+            // link.href = audioUrl;
+            // link.download = 'nigerian-voice.mp3';
+            // link.click();
+        }
+
+        // Play demo samples
+        function playDemo(voiceType) {
+            const demoTexts = {
+                'lagos-professional': "Good morning, this is your daily business update from Lagos State.",
+                'pidgin-friendly': "How you dey? Make we talk business small small.",
+                'yoruba-accent': "E ku aaro o! Today's weather go dey very fine."
+            };
+            
+            const utterance = new SpeechSynthesisUtterance(demoTexts[voiceType] || "Sample Nigerian voice.");
+            applyNigerianVoiceSettings(utterance, voiceType, 1.0);
+            speechSynthesis.speak(utterance);
+            
+            showStatus('Playing ' + voiceType + ' sample...', 'info');
+        }
+
+        // Show status messages
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+            setTimeout(() => {
+                if (statusDiv.innerHTML.includes(message)) {
+                    statusDiv.innerHTML = '';
+                }
+            }, 5000);
+        }
+
+        // Initialize voices when page loads
+        window.addEventListener('load', () => {
+            // Load available voices
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => {
+                    console.log('Voices loaded:', speechSynthesis.getVoices().length);
+                };
+            }
+            
+            showStatus('Welcome to NaijaVoice! Try generating some Nigerian voice audio above.', 'success');
+        });
+    </script>
+</body>
+</html>
